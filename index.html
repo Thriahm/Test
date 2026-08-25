@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vidéothèque</title>
+  <meta name="description" content="Catalogue de vidéos répertoriées." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./">
+        <span class="brand-mark" aria-hidden="true">▶</span>
+        <span class="brand-name">Vidéothèque</span>
+      </a>
+
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4a6 6 0 104.47 10.03l4.25 4.25 1.41-1.41-4.25-4.25A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z"/></svg>
+        <input id="search" type="search" placeholder="Rechercher une vidéo…" autocomplete="off" aria-label="Rechercher une vidéo" />
+        <button id="search-clear" class="search-clear" type="button" aria-label="Effacer la recherche" hidden>×</button>
+      </div>
+
+      <label class="sort-box">
+        <span class="sr-only">Trier</span>
+        <select id="sort" aria-label="Trier les vidéos">
+          <option value="recent">Plus récentes</option>
+          <option value="old">Plus anciennes</option>
+          <option value="title">Titre (A→Z)</option>
+          <option value="duration">Durée</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav id="categories" class="chips" aria-label="Catégories"></nav>
+
+    <p id="result-count" class="result-count" aria-live="polite"></p>
+
+    <section id="grid" class="grid" aria-label="Liste des vidéos"></section>
+
+    <p id="empty" class="empty" hidden>
+      Aucune vidéo ne correspond à votre recherche.
+    </p>
+
+    <section id="onboarding" class="onboarding" hidden>
+      <h2>Le catalogue est vide</h2>
+      <p>
+        Déposez vos fichiers vidéo dans le dossier <code>videos/</code>, puis lancez&nbsp;:
+      </p>
+      <pre><code>node scripts/generate-catalog.mjs</code></pre>
+      <p>
+        Le catalogue <code>data/videos.js</code> est régénéré automatiquement.
+        Voir le <a href="https://github.com/Thriahm/Test#readme">README</a> pour les détails.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span id="footer-count"></span>
+    </div>
+  </footer>
+
+  <!-- Lecteur -->
+  <div id="player" class="player" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="player-title">
+    <div class="player-backdrop" data-close></div>
+    <div class="player-panel" role="document">
+      <button class="player-close" type="button" data-close aria-label="Fermer le lecteur">×</button>
+      <div class="player-stage">
+        <button class="player-nav prev" type="button" id="prev-video" aria-label="Vidéo précédente">‹</button>
+        <video id="video" controls playsinline preload="metadata"></video>
+        <button class="player-nav next" type="button" id="next-video" aria-label="Vidéo suivante">›</button>
+      </div>
+      <div class="player-meta">
+        <h2 id="player-title"></h2>
+        <p id="player-sub" class="player-sub"></p>
+        <p id="player-desc" class="player-desc"></p>
+        <p class="player-actions">
+          <a id="player-download" class="btn" download>Télécharger</a>
+          <a id="player-source" class="btn btn-ghost" target="_blank" rel="noopener" hidden>Ouvrir la source</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="data/videos.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
