@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Undercover</title>
+  <meta name="description" content="Jeu d'ambiance Undercover à jouer à plusieurs sur un seul téléphone : un imposteur, zéro Mr White, plein de thèmes." />
+  <meta name="theme-color" content="#0b0c14" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Undercover" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <button id="btn-quit" class="icon-btn" type="button" aria-label="Quitter la partie" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg>
+      </button>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">🕵️</span>
+        <span id="brand-name" class="brand-name">Undercover</span>
+        <span id="brand-theme" class="brand-theme" hidden></span>
+      </div>
+      <button id="btn-rules" class="icon-btn" type="button" aria-label="Règles du jeu">?</button>
+    </header>
+
+    <main class="screens">
+
+      <!-- ===== Préparation ===== -->
+      <section id="screen-setup" class="screen" hidden>
+        <div class="hero">
+          <h1>Undercover</h1>
+          <p>Un seul téléphone, un imposteur parmi vous.</p>
+          <div class="badges">
+            <span class="badge badge-under">1 Undercover</span>
+            <span class="badge">0 Mr White</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Joueurs</h2>
+            <div class="stepper" role="group" aria-label="Nombre de joueurs">
+              <button id="players-minus" type="button" aria-label="Retirer un joueur">−</button>
+              <output id="players-count" aria-live="polite">4</output>
+              <button id="players-plus" type="button" aria-label="Ajouter un joueur">+</button>
+            </div>
+          </div>
+          <p class="hint">Entrez les prénoms dans l'ordre où vous êtes assis.</p>
+          <ol id="player-list" class="player-inputs"></ol>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Thèmes</h2>
+            <button id="themes-toggle" class="link-btn" type="button">Tout sélectionner</button>
+          </div>
+          <p id="themes-summary" class="hint"></p>
+          <div id="theme-grid" class="theme-grid"></div>
+        </div>
+
+        <div id="scores-panel" class="panel" hidden>
+          <div class="panel-head">
+            <h2>Classement</h2>
+            <button id="scores-reset" class="link-btn" type="button">Remettre à zéro</button>
+          </div>
+          <ol id="setup-scores" class="scoreboard"></ol>
+        </div>
+
+        <div class="actions">
+          <button id="btn-start" class="btn btn-primary btn-big" type="button">Lancer la partie</button>
+        </div>
+      </section>
+
+      <!-- ===== Passage du téléphone ===== -->
+      <section id="screen-pass" class="screen screen-center" hidden>
+        <p id="pass-step" class="step"></p>
+        <div class="center-block">
+          <div id="pass-avatar" class="avatar-slot"></div>
+          <p class="muted">Passe le téléphone à</p>
+          <h1 id="pass-name" class="player-name-big"></h1>
+          <p class="muted small">Les autres, ne regardez pas l'écran 👀</p>
+        </div>
+        <div class="actions">
+          <button id="btn-show-word" class="btn btn-primary btn-big" type="button">C'est moi, voir mon mot</button>
+        </div>
+      </section>
+
+      <!-- ===== Mot secret ===== -->
+      <section id="screen-reveal" class="screen screen-center" hidden>
+        <p id="reveal-for" class="step"></p>
+        <div class="center-block">
+          <div class="word-card">
+            <span class="word-label">Ton mot secret</span>
+            <span id="reveal-word" class="word"></span>
+            <span id="reveal-theme" class="word-theme"></span>
+          </div>
+          <p class="muted small">Mémorise-le bien. Personne ne sait s'il est civil ou Undercover… pas même toi&nbsp;!</p>
+        </div>
+        <div class="actions">
+          <button id="btn-hide-word" class="btn btn-primary btn-big" type="button">C'est retenu, cacher</button>
+        </div>
+      </section>
+
+      <!-- ===== Tour d'indices ===== -->
+      <section id="screen-discuss" class="screen" hidden>
+        <p id="discuss-step" class="step"></p>
+        <h1 class="title">À vous de parler</h1>
+        <p class="muted">Chacun donne <strong>un indice</strong> sur son mot, sans le dire, dans cet ordre&nbsp;:</p>
+        <ol id="speak-order" class="speak-order"></ol>
+        <div id="out-block" class="out-block" hidden>
+          <h2>Éliminés</h2>
+          <ul id="out-list" class="out-list"></ul>
+        </div>
+        <div class="actions">
+          <button id="btn-to-vote" class="btn btn-primary btn-big" type="button">Passer au vote</button>
+          <button id="btn-peek" class="btn btn-ghost" type="button">👁️ Revoir mon mot</button>
+        </div>
+      </section>
+
+      <!-- ===== Vote ===== -->
+      <section id="screen-vote" class="screen" hidden>
+        <p id="vote-step" class="step"></p>
+        <h1 class="title">Qui est l'Undercover&nbsp;?</h1>
+        <p class="muted">Comptez « 3, 2, 1 » et pointez tous en même temps le joueur le plus suspect. Sélectionnez ensuite celui qui a reçu le plus de votes.</p>
+        <div id="vote-grid" class="vote-grid"></div>
+        <p class="hint">Égalité&nbsp;? Les joueurs concernés se défendent, puis on revote entre eux.</p>
+        <div class="actions actions-split">
+          <button id="btn-back-discuss" class="btn btn-ghost" type="button">Retour</button>
+          <button id="btn-eliminate" class="btn btn-danger btn-big" type="button" disabled>Éliminer</button>
+        </div>
+      </section>
+
+      <!-- ===== Élimination ===== -->
+      <section id="screen-elim" class="screen screen-center" hidden>
+        <p id="elim-step" class="step"></p>
+        <div class="center-block">
+          <div id="elim-avatar" class="avatar-slot"></div>
+          <p class="muted"><strong id="elim-name"></strong> est éliminé·e. Son rôle était…</p>
+          <div id="elim-role" class="role-card"></div>
+          <p id="elim-msg" class="elim-msg"></p>
+        </div>
+        <div class="actions">
+          <button id="btn-elim-reveal" class="btn btn-primary btn-big" type="button">Révéler son rôle</button>
+          <button id="btn-elim-next" class="btn btn-primary btn-big" type="button" hidden>Tour suivant</button>
+        </div>
+      </section>
+
+      <!-- ===== Fin de partie ===== -->
+      <section id="screen-end" class="screen" hidden>
+        <div id="end-banner" class="end-banner"></div>
+        <div class="recap">
+          <div class="recap-item recap-civil">
+            <span>Mot des civils</span>
+            <strong id="end-civil-word"></strong>
+          </div>
+          <div class="recap-item recap-under">
+            <span>Mot de l'Undercover</span>
+            <strong id="end-under-word"></strong>
+          </div>
+        </div>
+        <ul id="end-players" class="end-players"></ul>
+        <div class="panel">
+          <div class="panel-head"><h2>Classement</h2></div>
+          <ol id="end-scores" class="scoreboard"></ol>
+        </div>
+        <div class="actions actions-split">
+          <button id="btn-menu" class="btn btn-ghost" type="button">Menu</button>
+          <button id="btn-replay" class="btn btn-primary btn-big" type="button">Rejouer</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Règles -->
+  <dialog id="rules" class="sheet" aria-labelledby="rules-title">
+    <div class="sheet-body">
+      <h2 id="rules-title">Règles du jeu</h2>
+      <p>Tous les joueurs reçoivent le <strong>même mot secret</strong>… sauf un&nbsp;: <strong>l'Undercover</strong>, qui reçoit un mot proche. Personne ne connaît son rôle, pas même l'Undercover&nbsp;!</p>
+      <h3>Déroulement</h3>
+      <ol>
+        <li><strong>Distribution</strong> — le téléphone passe de main en main&nbsp;: chacun découvre son mot en secret, puis le cache.</li>
+        <li><strong>Indices</strong> — dans l'ordre indiqué, chacun donne un indice sur son mot (un mot ou une courte phrase) sans jamais le prononcer.</li>
+        <li><strong>Vote</strong> — tout le monde désigne le joueur le plus suspect. Il est éliminé et son rôle est révélé.</li>
+        <li>On recommence un tour d'indices avec les joueurs restants.</li>
+      </ol>
+      <h3>Victoire</h3>
+      <ul>
+        <li><strong>Civils</strong>&nbsp;: éliminer l'Undercover. <em>+2&nbsp;points chacun.</em></li>
+        <li><strong>Undercover</strong>&nbsp;: survivre jusqu'à ce qu'il ne reste que 2&nbsp;joueurs. <em>+10&nbsp;points.</em></li>
+      </ul>
+      <h3>Astuces</h3>
+      <ul>
+        <li>Trop précis, tu aides l'Undercover à deviner le mot des civils&nbsp;; trop vague, tu deviens suspect.</li>
+        <li>Si les indices des autres te semblent bizarres, tu es peut-être l'Undercover&nbsp;: fonds-toi dans la masse&nbsp;!</li>
+      </ul>
+    </div>
+    <form method="dialog" class="sheet-actions">
+      <button class="btn btn-primary btn-big" value="close">Compris&nbsp;!</button>
+    </form>
+  </dialog>
+
+  <!-- Boîte de dialogue générique (confirmation, choix du joueur) -->
+  <dialog id="modal" class="sheet" aria-labelledby="modal-title">
+    <div class="sheet-body">
+      <h2 id="modal-title"></h2>
+      <div id="modal-content"></div>
+    </div>
+    <div id="modal-actions" class="sheet-actions"></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="words.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -4,6 +4,9 @@ Site web statique qui répertorie et lit des vidéos hébergées avec le site.
 Aucune dépendance, aucun build, aucune clé d'API : trois fichiers (HTML, CSS,
 JS) et un catalogue généré automatiquement à partir de vos fichiers.
 
+> Le dépôt contient aussi **[Undercover](undercover/)**, un jeu d'ambiance à
+> jouer à plusieurs sur un seul téléphone (voir `undercover/README.md`).
+
 ## Fonctionnalités
 
 - Grille de vignettes avec miniature extraite de la vidéo (aperçu animé au survol)
