@@ -14,7 +14,598 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="style.css" />
+  <style>
+:root {
+  --bg: #0b0c14;
+  --bg-2: #12142a;
+  --card: #171a31;
+  --card-2: #1e2240;
+  --border: #2a2f55;
+  --text: #f1f2fb;
+  --dim: #9ba1c6;
+  --accent: #8b7bff;
+  --accent-ink: #0b0c14;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --civil: #3ddc97;
+  --under: #ff4d6d;
+  --radius: 18px;
+  --shadow: 0 14px 40px rgba(0, 0, 0, .45);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+/* L'attribut hidden doit primer sur les règles display de ce fichier. */
+[hidden] { display: none !important; }
+
+html { height: 100%; -webkit-text-size-adjust: 100%; }
+
+body {
+  height: 100%;
+  margin: 0;
+  background:
+    radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .4s;
+}
+
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+
+h1, h2, h3 { margin: 0; line-height: 1.15; }
+
+.app {
+  width: min(560px, 100%);
+  min-height: 100%;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) 16px 0;
+}
+
+/* ---------- Barre du haut ---------- */
+
+.topbar {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.brand {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+.brand-mark { font-size: 1.25rem; }
+.brand-theme {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--card);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+.icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
+#btn-quit { grid-column: 1; }
+#btn-rules { grid-column: 3; }
+
+/* ---------- Écrans ---------- */
+
+.screens { flex: 1; display: flex; flex-direction: column; }
+
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 8px;
+  animation: screen-in .28s ease-out;
+}
+
+@keyframes screen-in {
+  from { opacity: .4; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.screen-center { text-align: center; }
+.center-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.step {
+  margin: 0;
+  color: var(--accent);
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.title { font-size: 1.8rem; }
+.muted { margin: 0; color: var(--dim); }
+.small { font-size: .9rem; }
+.hint { margin: 0; color: var(--dim); font-size: .85rem; }
+
+/* ---------- Boutons ---------- */
+
+.actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, var(--bg) 30%);
+}
+.actions-split { flex-direction: row; }
+.actions-split .btn-big { flex: 1; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  font-weight: 700;
+  transition: transform .12s, filter .15s, opacity .15s;
+}
+.btn:active:not(:disabled) { transform: scale(.97); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn-big { min-height: 58px; font-size: 1.08rem; border-radius: 16px; }
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.btn-danger {
+  background: #d62848;
+  color: #fff;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--under) 35%, transparent);
+}
+.btn-ghost { background: var(--card); border-color: var(--border); }
+
+.link-btn {
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Accueil / préparation ---------- */
+
+.hero { padding: 12px 0 4px; text-align: center; }
+.hero h1 {
+  font-size: clamp(2.4rem, 11vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: -.02em;
+  background: linear-gradient(135deg, #fff, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero p { margin: 6px 0 12px; color: var(--dim); }
+
+.badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.badge {
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  font-size: .85rem;
+  font-weight: 700;
+}
+.badge-under {
+  border-color: color-mix(in srgb, var(--under) 50%, transparent);
+  background: color-mix(in srgb, var(--under) 14%, transparent);
+  color: var(--under);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+}
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.panel-head h2 { font-size: 1.1rem; }
+
+.stepper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-2);
+}
+.stepper button {
+  width: 42px;
+  height: 38px;
+  border: 0;
+  background: none;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.stepper button:disabled { opacity: .3; }
+.stepper output { min-width: 24px; text-align: center; font-weight: 800; }
+
+.player-inputs { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.player-row { display: flex; align-items: center; gap: 10px; }
+.player-row input {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-2);
+  font-size: 1rem;
+}
+.player-row input::placeholder { color: color-mix(in srgb, var(--dim) 70%, transparent); }
+.player-row input:focus { outline: none; border-color: var(--accent); }
+
+.avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c, var(--accent));
+  color: #0b0c14;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.avatar-slot { display: grid; place-items: center; }
+.avatar-xl {
+  width: 96px;
+  height: 96px;
+  font-size: 2.6rem;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 25%, transparent), var(--shadow);
+}
+
+.theme-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.theme-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-2);
+  text-align: left;
+  transition: border-color .15s, background .15s, transform .12s;
+}
+.theme-card:active { transform: scale(.97); }
+.theme-card[aria-pressed="true"] {
+  border-color: var(--theme);
+  background: color-mix(in srgb, var(--theme) 14%, var(--bg-2));
+}
+.theme-card[aria-pressed="true"]::after {
+  content: "✓";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--theme);
+  color: #0b0c14;
+  font-size: .8rem;
+  font-weight: 900;
+}
+.theme-emoji { font-size: 1.6rem; line-height: 1.2; }
+.theme-name { font-weight: 800; font-size: .95rem; line-height: 1.2; }
+.theme-count { color: var(--dim); font-size: .78rem; }
+
+/* ---------- Distribution ---------- */
+
+.player-name-big { font-size: clamp(2rem, 10vw, 2.8rem); word-break: break-word; }
+
+.word-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 20px;
+  border: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  border-radius: 24px;
+  background:
+    radial-gradient(100% 100% at 50% 0%, var(--accent-soft), transparent),
+    var(--card);
+  box-shadow: var(--shadow);
+  animation: flip-in .45s cubic-bezier(.2, .8, .3, 1.2);
+}
+@keyframes flip-in {
+  from { opacity: 0; transform: perspective(800px) rotateY(80deg); }
+  to { opacity: 1; transform: none; }
+}
+.word-label {
+  color: var(--dim);
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.word {
+  font-size: clamp(2rem, 11vw, 3.2rem);
+  font-weight: 900;
+  line-height: 1.1;
+  word-break: break-word;
+  color: var(--accent);
+}
+.word-theme { color: var(--dim); font-size: .9rem; }
+
+/* ---------- Indices ---------- */
+
+.speak-order { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: speak; }
+.speak-order li {
+  counter-increment: speak;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  font-weight: 700;
+}
+.speak-order li::before {
+  content: counter(speak);
+  width: 24px;
+  color: var(--dim);
+  font-weight: 900;
+  text-align: center;
+}
+.speak-order li.first {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+}
+.speak-order .tag {
+  margin-left: auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: .75rem;
+  font-weight: 800;
+}
+
+.out-block h2 { margin-bottom: 8px; color: var(--dim); font-size: .85rem; letter-spacing: .1em; text-transform: uppercase; }
+.out-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.out-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--dim);
+  font-size: .9rem;
+}
+.out-list .avatar { width: 26px; height: 26px; font-size: .8rem; opacity: .6; }
+.out-list s { text-decoration-thickness: 2px; }
+
+/* ---------- Vote ---------- */
+
+.vote-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.vote-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 10px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  font-weight: 800;
+  word-break: break-word;
+  transition: border-color .15s, background .15s, transform .12s;
+}
+.vote-card .avatar { width: 52px; height: 52px; font-size: 1.4rem; }
+.vote-card:active { transform: scale(.97); }
+.vote-card[aria-pressed="true"] {
+  border-color: var(--under);
+  background: color-mix(in srgb, var(--under) 16%, var(--card));
+}
+
+/* ---------- Élimination ---------- */
+
+.role-card {
+  min-width: 70%;
+  padding: 22px 24px;
+  border: 2px dashed var(--border);
+  border-radius: 22px;
+  background: var(--card);
+  color: var(--dim);
+  font-size: 2.4rem;
+  font-weight: 900;
+}
+.role-card.is-civil,
+.role-card.is-under { border-style: solid; animation: pop .5s cubic-bezier(.2, .8, .3, 1.4); }
+.role-card.is-civil { border-color: var(--civil); color: var(--civil); background: color-mix(in srgb, var(--civil) 12%, var(--card)); }
+.role-card.is-under { border-color: var(--under); color: var(--under); background: color-mix(in srgb, var(--under) 14%, var(--card)); }
+.role-card small { display: block; margin-top: 4px; color: var(--dim); font-size: .95rem; font-weight: 600; }
+
+@keyframes pop {
+  0% { opacity: 0; transform: scale(.6); }
+  100% { opacity: 1; transform: none; }
+}
+
+.elim-msg { min-height: 3em; margin: 4px 0 0; font-weight: 600; }
+
+/* ---------- Fin de partie ---------- */
+
+.end-banner {
+  padding: 22px 18px;
+  border-radius: 22px;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 900;
+  line-height: 1.2;
+  animation: pop .5s cubic-bezier(.2, .8, .3, 1.4);
+}
+.end-banner small { display: block; margin-top: 6px; font-size: .95rem; font-weight: 600; opacity: .85; }
+.end-banner.win-civil { background: color-mix(in srgb, var(--civil) 18%, var(--card)); border: 2px solid var(--civil); color: var(--civil); }
+.end-banner.win-under { background: color-mix(in srgb, var(--under) 18%, var(--card)); border: 2px solid var(--under); color: var(--under); }
+
+.recap { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.recap-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+}
+.recap-item span { color: var(--dim); font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.recap-item strong { font-size: 1.2rem; word-break: break-word; }
+.recap-civil strong { color: var(--civil); }
+.recap-under strong { color: var(--under); }
+
+.end-players { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.end-players li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+}
+.end-players li.is-under { border-color: color-mix(in srgb, var(--under) 60%, transparent); }
+.end-players .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.end-players .who strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.end-players .who span { color: var(--dim); font-size: .82rem; }
+.end-players .pts { font-weight: 900; color: var(--civil); }
+.end-players .pts.zero { color: var(--dim); font-weight: 600; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; counter-reset: rank; }
+.scoreboard li {
+  counter-increment: rank;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.scoreboard li:last-child { border-bottom: 0; }
+.scoreboard li::before { content: counter(rank); width: 22px; color: var(--dim); font-weight: 800; text-align: center; }
+.scoreboard li:first-child::before { content: "👑"; }
+.scoreboard .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.scoreboard .score { font-weight: 900; font-variant-numeric: tabular-nums; }
+.scoreboard .avatar { width: 28px; height: 28px; font-size: .85rem; }
+
+/* ---------- Feuilles modales ---------- */
+
+.sheet {
+  width: min(560px, 100%);
+  max-width: 100%;
+  max-height: 88vh;
+  max-height: 88dvh;
+  margin: auto auto 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  background: var(--bg-2);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.sheet[open] { display: flex; flex-direction: column; animation: sheet-up .25s ease-out; }
+.sheet::backdrop { background: rgba(4, 5, 12, .7); backdrop-filter: blur(3px); }
+@keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.sheet-body { overflow-y: auto; padding: 22px 20px 8px; }
+.sheet-body h2 { margin-bottom: 12px; font-size: 1.4rem; }
+.sheet-body h3 { margin: 18px 0 6px; color: var(--accent); font-size: 1rem; }
+.sheet-body p, .sheet-body li { color: #d6d9ef; }
+.sheet-body ol, .sheet-body ul { margin: 0; padding-left: 20px; }
+.sheet-body li { margin-bottom: 6px; }
+.sheet-actions {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+}
+.sheet-actions .btn { flex: 1; }
+
+.pick-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pick-list .vote-card { padding: 12px 8px; }
+.pick-list .vote-card .avatar { width: 40px; height: 40px; font-size: 1.1rem; }
+
+/* ---------- Toast ---------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  z-index: 10;
+  max-width: calc(100% - 32px);
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card-2);
+  box-shadow: var(--shadow);
+  font-weight: 600;
+  transform: translateX(-50%);
+  animation: screen-in .2s ease-out;
+}
+
+@media (min-width: 420px) {
+  .theme-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+  </style>
 </head>
 <body>
   <div class="app">
@@ -217,7 +808,1300 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="words.js"></script>
-  <script src="app.js"></script>
+  <script>
+/* Undercover — thèmes et paires de mots.
+   Chaque paire contient deux mots proches : l'un est donné aux civils,
+   l'autre à l'Undercover (le sens est tiré au hasard à chaque partie).
+   Ajoutez vos propres thèmes ou paires en suivant le même format. */
+
+window.UNDERCOVER_THEMES = [
+  {
+    id: "lol",
+    name: "League of Legends",
+    emoji: "⚔️",
+    color: "#c89b3c",
+    pairs: [
+      ["Garen", "Darius"],
+      ["Jinx", "Vi"],
+      ["Yasuo", "Yone"],
+      ["Xayah", "Rakan"],
+      ["Kayle", "Morgana"],
+      ["Lux", "Syndra"],
+      ["Ashe", "Sejuani"],
+      ["Teemo", "Tristana"],
+      ["Nasus", "Renekton"],
+      ["Rammus", "Malphite"],
+      ["Thresh", "Blitzcrank"],
+      ["Zed", "Shen"],
+      ["Master Yi", "Wukong"],
+      ["Lee Sin", "Udyr"],
+      ["Katarina", "Talon"],
+      ["Draven", "Olaf"],
+      ["Rengar", "Kha'Zix"],
+      ["Annie", "Brand"],
+      ["Jayce", "Viktor"],
+      ["Leona", "Diana"],
+      ["Soraka", "Janna"],
+      ["Riven", "Irelia"],
+      ["Cho'Gath", "Kog'Maw"],
+      ["Senna", "Lucian"],
+      ["Veigar", "Ziggs"],
+      ["Dr. Mundo", "Singed"],
+      ["Ahri", "Evelynn"],
+      ["Caitlyn", "Jhin"],
+      ["Baron Nashor", "Héraut de la Faille"],
+      ["Nexus", "Inhibiteur"],
+      ["Flash", "Ghost"],
+      ["Support", "ADC"],
+      ["Midlane", "Toplane"],
+      ["Pentakill", "Quadrakill"],
+      ["Gank", "Roam"],
+      ["Faker", "Caps"],
+      ["Worlds", "MSI"],
+      ["Arcane", "K/DA"],
+      ["Demacia", "Noxus"],
+      ["Zaun", "Piltover"]
+    ]
+  },
+  {
+    id: "valorant",
+    name: "Valorant",
+    emoji: "🎯",
+    color: "#ff4655",
+    pairs: [
+      ["Jett", "Reyna"],
+      ["Sage", "Skye"],
+      ["Sova", "Fade"],
+      ["Brimstone", "Omen"],
+      ["Viper", "Astra"],
+      ["Cypher", "Killjoy"],
+      ["Phoenix", "Raze"],
+      ["Breach", "KAY/O"],
+      ["Chamber", "Deadlock"],
+      ["Neon", "Yoru"],
+      ["Vandal", "Phantom"],
+      ["Operator", "Marshal"],
+      ["Sheriff", "Ghost"],
+      ["Spectre", "Stinger"],
+      ["Judge", "Bucky"],
+      ["Classic", "Frenzy"],
+      ["Ascent", "Haven"],
+      ["Bind", "Split"],
+      ["Icebox", "Breeze"],
+      ["Lotus", "Pearl"],
+      ["Ace", "Clutch"],
+      ["Radiant", "Immortel"],
+      ["Eco", "Force buy"],
+      ["Headshot", "Wallbang"],
+      ["Planter la Spike", "Désamorcer la Spike"]
+    ]
+  },
+  {
+    id: "pokemon",
+    name: "Pokémon",
+    emoji: "⚡",
+    color: "#ffcb05",
+    pairs: [
+      ["Pikachu", "Raichu"],
+      ["Salamèche", "Poussifeu"],
+      ["Bulbizarre", "Germignon"],
+      ["Carapuce", "Kaiminus"],
+      ["Mew", "Mewtwo"],
+      ["Ronflex", "Ursaring"],
+      ["Rondoudou", "Mélofée"],
+      ["Magicarpe", "Léviator"],
+      ["Aquali", "Pyroli"],
+      ["Évoli", "Goupix"],
+      ["Sacha", "Régis"],
+      ["Pierre", "Ondine"],
+      ["Jessie", "James"],
+      ["Miaouss", "Persian"],
+      ["Lugia", "Ho-Oh"],
+      ["Groudon", "Kyogre"],
+      ["Dialga", "Palkia"],
+      ["Artikodin", "Sulfura"],
+      ["Pokéball", "Masterball"],
+      ["Arcanin", "Galopa"],
+      ["Ectoplasma", "Mimiqui"],
+      ["Lucario", "Amphinobi"],
+      ["Psykokwak", "Ptitard"],
+      ["Onix", "Steelix"],
+      ["Tortank", "Florizarre"],
+      ["Dracaufeu", "Dracolosse"],
+      ["Nidoking", "Nidoqueen"],
+      ["Rattata", "Roucool"],
+      ["Centre Pokémon", "Arène"],
+      ["Méga-évolution", "Dynamax"]
+    ]
+  },
+  {
+    id: "harry-potter",
+    name: "Harry Potter",
+    emoji: "🪄",
+    color: "#b58cff",
+    pairs: [
+      ["Gryffondor", "Serpentard"],
+      ["Serdaigle", "Poufsouffle"],
+      ["Harry Potter", "Cedric Diggory"],
+      ["Ron", "Neville"],
+      ["Hermione", "Luna"],
+      ["Fred", "George"],
+      ["Dumbledore", "Grindelwald"],
+      ["Voldemort", "Bellatrix"],
+      ["Rogue", "McGonagall"],
+      ["Lupin", "Sirius"],
+      ["Hagrid", "Rusard"],
+      ["Dobby", "Kreattur"],
+      ["Drago", "Dudley"],
+      ["Hedwige", "Fumseck"],
+      ["Croûtard", "Pattenrond"],
+      ["Nagini", "Basilic"],
+      ["Vif d'or", "Souafle"],
+      ["Nimbus 2000", "Éclair de Feu"],
+      ["Quidditch", "Tournoi des Trois Sorciers"],
+      ["Poudlard", "Durmstrang"],
+      ["Gringotts", "Azkaban"],
+      ["Chemin de Traverse", "Pré-au-Lard"],
+      ["Cape d'invisibilité", "Carte du Maraudeur"],
+      ["Retourneur de temps", "Pensine"],
+      ["Choixpeau", "Miroir du Riséd"],
+      ["Horcruxe", "Relique de la Mort"],
+      ["Détraqueur", "Mangemort"],
+      ["Patronus", "Animagus"],
+      ["Expelliarmus", "Stupéfix"],
+      ["Moldu", "Cracmol"],
+      ["Bièraubeurre", "Jus de citrouille"]
+    ]
+  },
+  {
+    id: "super-heros",
+    name: "Marvel & DC",
+    emoji: "🦸",
+    color: "#ff5a4e",
+    pairs: [
+      ["Iron Man", "Batman"],
+      ["Captain America", "Wonder Woman"],
+      ["Thor", "Loki"],
+      ["Hulk", "La Chose"],
+      ["Spider-Man", "Deadpool"],
+      ["Superman", "Shazam"],
+      ["Joker", "Harley Quinn"],
+      ["Thanos", "Darkseid"],
+      ["Wolverine", "Dents-de-Sabre"],
+      ["Magneto", "Professeur X"],
+      ["Flash", "Quicksilver"],
+      ["Aquaman", "Namor"],
+      ["Black Widow", "Catwoman"],
+      ["Doctor Strange", "Scarlet Witch"],
+      ["Groot", "Rocket"],
+      ["Venom", "Carnage"],
+      ["Ant-Man", "La Guêpe"],
+      ["Black Panther", "Daredevil"],
+      ["Green Lantern", "Captain Marvel"],
+      ["Hawkeye", "Green Arrow"],
+      ["Robin", "Batgirl"],
+      ["Lex Luthor", "Le Bouffon Vert"],
+      ["Nick Fury", "Commissaire Gordon"],
+      ["Avengers", "Justice League"],
+      ["X-Men", "Les 4 Fantastiques"],
+      ["Gotham", "Metropolis"],
+      ["Wakanda", "Asgard"],
+      ["Mjöllnir", "Stormbreaker"]
+    ]
+  },
+  {
+    id: "star-wars",
+    name: "Star Wars",
+    emoji: "🌌",
+    color: "#4fc3f7",
+    pairs: [
+      ["Luke Skywalker", "Anakin Skywalker"],
+      ["Dark Vador", "Palpatine"],
+      ["Yoda", "Obi-Wan Kenobi"],
+      ["Qui-Gon Jinn", "Mace Windu"],
+      ["Han Solo", "Lando Calrissian"],
+      ["Leia", "Padmé"],
+      ["Rey", "Jyn Erso"],
+      ["Ahsoka", "Asajj Ventress"],
+      ["Kylo Ren", "Dark Maul"],
+      ["Comte Dooku", "Général Grievous"],
+      ["Mandalorien", "Boba Fett"],
+      ["Chewbacca", "Ewok"],
+      ["Grogu", "Porg"],
+      ["R2-D2", "BB-8"],
+      ["C-3PO", "K-2SO"],
+      ["Jedi", "Sith"],
+      ["Stormtrooper", "Clone"],
+      ["Rébellion", "Résistance"],
+      ["Sabre laser", "Blaster"],
+      ["X-Wing", "TIE Fighter"],
+      ["Faucon Millenium", "Razor Crest"],
+      ["Étoile de la Mort", "Destroyer stellaire"],
+      ["Tatooine", "Jakku"],
+      ["Endor", "Kashyyyk"],
+      ["Hoth", "Mustafar"]
+    ]
+  },
+  {
+    id: "mangas",
+    name: "Mangas & animés",
+    emoji: "🍥",
+    color: "#ff8a2a",
+    pairs: [
+      ["Naruto", "Sasuke"],
+      ["Kakashi", "Jiraiya"],
+      ["Itachi", "Madara"],
+      ["Goku", "Vegeta"],
+      ["Gohan", "Goten"],
+      ["Freezer", "Cell"],
+      ["Piccolo", "Majin Buu"],
+      ["Bulma", "Chichi"],
+      ["Luffy", "Ace"],
+      ["Zoro", "Sanji"],
+      ["Nami", "Robin"],
+      ["Shanks", "Barbe Blanche"],
+      ["Eren", "Livaï"],
+      ["Tanjiro", "Zenitsu"],
+      ["Rengoku", "Giyu"],
+      ["Gojo", "Sukuna"],
+      ["Light Yagami", "L"],
+      ["Deku", "Bakugo"],
+      ["All Might", "Endeavor"],
+      ["Gon", "Kirua"],
+      ["Saitama", "Genos"],
+      ["Totoro", "Ponyo"],
+      ["Kamehameha", "Rasengan"],
+      ["Sharingan", "Byakugan"],
+      ["Super Saiyan", "Mode Ermite"],
+      ["Fruit du Démon", "Haki"],
+      ["Hokage", "Kazekage"],
+      ["Titan colossal", "Titan cuirassé"]
+    ]
+  },
+  {
+    id: "jeux-video",
+    name: "Jeux vidéo",
+    emoji: "🎮",
+    color: "#5ee07a",
+    pairs: [
+      ["Mario", "Luigi"],
+      ["Wario", "Waluigi"],
+      ["Peach", "Daisy"],
+      ["Bowser", "Donkey Kong"],
+      ["Kirby", "Yoshi"],
+      ["Link", "Zelda"],
+      ["Sonic", "Crash Bandicoot"],
+      ["Rayman", "Spyro"],
+      ["Kratos", "Geralt"],
+      ["Master Chief", "Doom Slayer"],
+      ["Lara Croft", "Nathan Drake"],
+      ["Creeper", "Enderman"],
+      ["Minecraft", "Roblox"],
+      ["Fortnite", "PUBG"],
+      ["Among Us", "Fall Guys"],
+      ["GTA", "Red Dead Redemption"],
+      ["Call of Duty", "Battlefield"],
+      ["FIFA", "PES"],
+      ["Rocket League", "Mario Kart"],
+      ["Clash Royale", "Clash of Clans"],
+      ["Les Sims", "Animal Crossing"],
+      ["Skyrim", "Elden Ring"],
+      ["Tetris", "Candy Crush"],
+      ["Pac-Man", "Space Invaders"],
+      ["PlayStation", "Xbox"],
+      ["Nintendo Switch", "Wii"],
+      ["Steam", "Epic Games"]
+    ]
+  },
+  {
+    id: "films-series",
+    name: "Films & séries",
+    emoji: "🎬",
+    color: "#ff5c8a",
+    pairs: [
+      ["Titanic", "Avatar"],
+      ["Le Seigneur des Anneaux", "Le Hobbit"],
+      ["Game of Thrones", "House of the Dragon"],
+      ["Stranger Things", "Dark"],
+      ["Breaking Bad", "Narcos"],
+      ["La Casa de Papel", "Lupin"],
+      ["Friends", "How I Met Your Mother"],
+      ["The Office", "Brooklyn Nine-Nine"],
+      ["Les Simpson", "Les Griffin"],
+      ["Squid Game", "Hunger Games"],
+      ["Sherlock", "Dr House"],
+      ["Mercredi", "Sabrina"],
+      ["Peaky Blinders", "Le Parrain"],
+      ["Jurassic Park", "King Kong"],
+      ["Shrek", "Kung Fu Panda"],
+      ["Les Minions", "Les Lapins Crétins"],
+      ["Matrix", "Inception"],
+      ["Dune", "Interstellar"],
+      ["Rocky", "Creed"],
+      ["Fast & Furious", "Taxi"],
+      ["James Bond", "Mission Impossible"],
+      ["Terminator", "RoboCop"],
+      ["Alien", "Predator"],
+      ["Scream", "Halloween"],
+      ["Retour vers le futur", "Les Visiteurs"],
+      ["Astérix et Obélix", "Kaamelott"],
+      ["Intouchables", "Bienvenue chez les Ch'tis"],
+      ["Jack Sparrow", "Capitaine Crochet"],
+      ["Gandalf", "Dumbledore"]
+    ]
+  },
+  {
+    id: "disney",
+    name: "Disney & Pixar",
+    emoji: "🏰",
+    color: "#7aa7ff",
+    pairs: [
+      ["Elsa", "Anna"],
+      ["Olaf", "Sven"],
+      ["Woody", "Buzz l'Éclair"],
+      ["Nemo", "Dory"],
+      ["Mickey", "Donald"],
+      ["Dingo", "Pluto"],
+      ["Cendrillon", "Blanche-Neige"],
+      ["Ariel", "Vaiana"],
+      ["Raiponce", "Belle"],
+      ["Mulan", "Pocahontas"],
+      ["Aladdin", "Hercule"],
+      ["Peter Pan", "Pinocchio"],
+      ["Simba", "Mufasa"],
+      ["Timon", "Pumbaa"],
+      ["Jafar", "Scar"],
+      ["Ursula", "Maléfique"],
+      ["Gaston", "Hadès"],
+      ["Le Génie", "La Fée Clochette"],
+      ["Stitch", "Wall-E"],
+      ["Flash McQueen", "Martin"],
+      ["Sulli", "Bob"],
+      ["Winnie l'ourson", "Baloo"],
+      ["Bambi", "Dumbo"],
+      ["Le Roi Lion", "Le Livre de la Jungle"],
+      ["Vice-Versa", "Soul"],
+      ["Coco", "Encanto"],
+      ["Les Indestructibles", "Les Nouveaux Héros"]
+    ]
+  },
+  {
+    id: "nourriture",
+    name: "Nourriture",
+    emoji: "🍕",
+    color: "#ffa94d",
+    pairs: [
+      ["Pizza", "Quiche"],
+      ["Burger", "Sandwich"],
+      ["Tacos", "Kebab"],
+      ["Hot-dog", "Croque-monsieur"],
+      ["Croissant", "Pain au chocolat"],
+      ["Crêpe", "Gaufre"],
+      ["Sushi", "Maki"],
+      ["Ramen", "Pho"],
+      ["Frites", "Chips"],
+      ["Pâtes", "Riz"],
+      ["Lasagnes", "Moussaka"],
+      ["Couscous", "Tajine"],
+      ["Raclette", "Fondue"],
+      ["Camembert", "Brie"],
+      ["Beurre", "Margarine"],
+      ["Ketchup", "Mayonnaise"],
+      ["Nutella", "Confiture"],
+      ["Miel", "Sirop d'érable"],
+      ["Chocolat", "Caramel"],
+      ["Macaron", "Meringue"],
+      ["Donut", "Muffin"],
+      ["Glace", "Sorbet"],
+      ["Popcorn", "Barbe à papa"],
+      ["Café", "Thé"],
+      ["Coca-Cola", "Pepsi"],
+      ["Pomme", "Poire"],
+      ["Fraise", "Framboise"],
+      ["Citron", "Pamplemousse"],
+      ["Banane", "Ananas"],
+      ["Brocoli", "Chou-fleur"]
+    ]
+  },
+  {
+    id: "animaux",
+    name: "Animaux",
+    emoji: "🐾",
+    color: "#3ddc97",
+    pairs: [
+      ["Chien", "Loup"],
+      ["Chat", "Lynx"],
+      ["Lion", "Tigre"],
+      ["Ours", "Panda"],
+      ["Gorille", "Chimpanzé"],
+      ["Éléphant", "Rhinocéros"],
+      ["Cheval", "Zèbre"],
+      ["Chameau", "Dromadaire"],
+      ["Kangourou", "Koala"],
+      ["Lapin", "Écureuil"],
+      ["Souris", "Hamster"],
+      ["Mouton", "Chèvre"],
+      ["Vache", "Buffle"],
+      ["Poule", "Canard"],
+      ["Pingouin", "Manchot"],
+      ["Hibou", "Chouette"],
+      ["Aigle", "Faucon"],
+      ["Perroquet", "Toucan"],
+      ["Flamant rose", "Cygne"],
+      ["Dauphin", "Requin"],
+      ["Baleine", "Orque"],
+      ["Méduse", "Pieuvre"],
+      ["Crocodile", "Alligator"],
+      ["Grenouille", "Crapaud"],
+      ["Tortue", "Escargot"],
+      ["Serpent", "Ver de terre"],
+      ["Abeille", "Guêpe"],
+      ["Papillon", "Libellule"],
+      ["Araignée", "Scorpion"]
+    ]
+  },
+  {
+    id: "sport",
+    name: "Sport",
+    emoji: "⚽",
+    color: "#22c1ee",
+    pairs: [
+      ["Football", "Rugby"],
+      ["Basket", "Handball"],
+      ["Tennis", "Badminton"],
+      ["Ping-pong", "Squash"],
+      ["Volley", "Water-polo"],
+      ["Ski", "Snowboard"],
+      ["Surf", "Skate"],
+      ["Natation", "Plongée"],
+      ["Boxe", "Karaté"],
+      ["Judo", "Lutte"],
+      ["Golf", "Hockey"],
+      ["Pétanque", "Bowling"],
+      ["Escalade", "Parkour"],
+      ["CrossFit", "Musculation"],
+      ["Formule 1", "Rallye"],
+      ["Tour de France", "Marathon"],
+      ["Messi", "Ronaldo"],
+      ["Mbappé", "Neymar"],
+      ["Zidane", "Ronaldinho"],
+      ["LeBron James", "Michael Jordan"],
+      ["Nadal", "Federer"],
+      ["PSG", "OM"],
+      ["Real Madrid", "FC Barcelone"],
+      ["Coupe du monde", "Ligue des champions"],
+      ["Carton rouge", "Carton jaune"],
+      ["Penalty", "Coup franc"],
+      ["Arbitre", "Entraîneur"]
+    ]
+  },
+  {
+    id: "quotidien",
+    name: "Vie quotidienne",
+    emoji: "🏠",
+    color: "#c792ea",
+    pairs: [
+      ["Téléphone", "Tablette"],
+      ["Ordinateur", "Télévision"],
+      ["Netflix", "YouTube"],
+      ["Instagram", "TikTok"],
+      ["WhatsApp", "Snapchat"],
+      ["Lit", "Canapé"],
+      ["Chaise", "Tabouret"],
+      ["Fourchette", "Cuillère"],
+      ["Four", "Micro-ondes"],
+      ["Frigo", "Congélateur"],
+      ["Douche", "Baignoire"],
+      ["Brosse à dents", "Peigne"],
+      ["Miroir", "Fenêtre"],
+      ["Bougie", "Lampe"],
+      ["Stylo", "Crayon"],
+      ["Montre", "Réveil"],
+      ["Clé", "Cadenas"],
+      ["Lunettes", "Lentilles"],
+      ["Casquette", "Bonnet"],
+      ["Chaussettes", "Gants"],
+      ["Parapluie", "Parasol"],
+      ["Sac à dos", "Valise"],
+      ["Voiture", "Moto"],
+      ["Bus", "Métro"],
+      ["Avion", "Hélicoptère"],
+      ["Plage", "Piscine"],
+      ["Mer", "Montagne"],
+      ["Été", "Printemps"],
+      ["Noël", "Anniversaire"],
+      ["Professeur", "Directeur"]
+    ]
+  }
+];
+  </script>
+  <script>
+/* Undercover — jeu d'ambiance à jouer sur un seul téléphone.
+   Règle fixe : 1 Undercover, 0 Mr White. Les paires de mots sont fournies
+   par words.js (window.UNDERCOVER_THEMES). */
+
+(function () {
+  "use strict";
+
+  var THEMES = (Array.isArray(window.UNDERCOVER_THEMES) ? window.UNDERCOVER_THEMES : [])
+    .filter(function (t) { return t && t.id && Array.isArray(t.pairs) && t.pairs.length; });
+
+  var MIN_PLAYERS = 3;
+  var MAX_PLAYERS = 8;
+  var DEFAULT_PLAYERS = 4;
+  var POINTS_CIVIL = 2;
+  var POINTS_UNDERCOVER = 10;
+  var DEFAULT_ACCENT = "#8b7bff";
+  var COLORS = ["#ff6b6b", "#4dabf7", "#ffd43b", "#69db7c", "#da77f2", "#ff922b", "#38d9a9", "#f783ac"];
+
+  var KEYS = {
+    settings: "undercover:settings",
+    game: "undercover:game",
+    scores: "undercover:scores",
+    used: "undercover:used"
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- Stockage local ---------- */
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* stockage indisponible */ }
+  }
+
+  function drop(key) {
+    try { localStorage.removeItem(key); } catch (e) { /* stockage indisponible */ }
+  }
+
+  /* ---------- Utilitaires ---------- */
+
+  // Entier aléatoire dans [0, n[, sans biais de modulo.
+  function randomInt(n) {
+    if (window.crypto && crypto.getRandomValues) {
+      var buf = new Uint32Array(1);
+      var limit = Math.floor(0x100000000 / n) * n;
+      do { crypto.getRandomValues(buf); } while (buf[0] >= limit);
+      return buf[0] % n;
+    }
+    return Math.floor(Math.random() * n);
+  }
+
+  function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+  function themeById(id) {
+    for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === id) return THEMES[i];
+    return null;
+  }
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = text;
+    return node;
+  }
+
+  function fill(parent, child) {
+    parent.textContent = "";
+    parent.appendChild(child);
+  }
+
+  function avatar(name, seat, extraClass) {
+    var node = el("span", "avatar" + (extraClass ? " " + extraClass : ""));
+    node.style.setProperty("--c", COLORS[seat % COLORS.length]);
+    node.textContent = initial(name) || String(seat + 1);
+    node.setAttribute("aria-hidden", "true");
+    return node;
+  }
+
+  function initial(name) {
+    var chars = Array.from(String(name || "").trim());
+    return chars.length ? chars[0].toUpperCase() : "";
+  }
+
+  function plural(n, one, many) { return n + " " + (n > 1 ? many : one); }
+
+  var toastTimer = null;
+  function toast(message) {
+    var node = $("toast");
+    node.textContent = message;
+    node.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { node.hidden = true; }, 2200);
+  }
+
+  function buzz(pattern) {
+    if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) { /* ignoré */ } }
+  }
+
+  /* ---------- État ---------- */
+
+  var stored = load(KEYS.settings, null) || {};
+  var settings = {
+    names: Array.isArray(stored.names) ? stored.names.map(String) : [],
+    count: clamp(parseInt(stored.count, 10) || DEFAULT_PLAYERS, MIN_PLAYERS, MAX_PLAYERS),
+    // Première visite : tous les thèmes sont cochés.
+    themes: Array.isArray(stored.themes) ? stored.themes.filter(themeById) : THEMES.map(function (t) { return t.id; })
+  };
+
+  var scores = load(KEYS.scores, {}) || {};
+  var game = restoreGame();
+  var voteChoice = null;
+
+  function saveSettings() { save(KEYS.settings, settings); }
+  function saveGame() { if (game) save(KEYS.game, game); else drop(KEYS.game); }
+
+  function restoreGame() {
+    var g = load(KEYS.game, null);
+    if (!g || !Array.isArray(g.players) || g.players.length < MIN_PLAYERS || !g.phase) return null;
+    // Ne jamais réafficher un mot après un rechargement : on repasse par l'écran « passe le téléphone ».
+    if (g.phase === "reveal") g.phase = "pass";
+    if (g.peek != null && g.phase === "pass") { g.peek = null; g.phase = "discuss"; }
+    return g;
+  }
+
+  function wordOf(player) { return player.role === "undercover" ? game.underWord : game.civilWord; }
+  function alivePlayers() { return game.players.filter(function (p) { return p.alive; }); }
+
+  /* ---------- Garder l'écran allumé pendant la partie ---------- */
+
+  var wakeLock = null;
+  function keepAwake(on) {
+    if (!("wakeLock" in navigator)) return;
+    if (on && !wakeLock && document.visibilityState === "visible") {
+      navigator.wakeLock.request("screen").then(function (lock) {
+        wakeLock = lock;
+        lock.addEventListener("release", function () { wakeLock = null; });
+      }).catch(function () { /* refusé : sans importance */ });
+    } else if (!on && wakeLock) {
+      wakeLock.release().catch(function () {});
+      wakeLock = null;
+    }
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") {
+      if (game) keepAwake(true);
+    } else if (game && game.phase === "reveal") {
+      // Téléphone verrouillé ou appli quittée pendant qu'un mot est affiché : on le cache.
+      game.phase = "pass";
+      saveGame();
+      render();
+    }
+  });
+
+  /* ---------- Préparation ---------- */
+
+  function renderSetup() {
+    renderPlayerInputs();
+    renderThemes();
+    renderScoreboard($("setup-scores"), Object.keys(scores));
+    $("scores-panel").hidden = !Object.keys(scores).length;
+  }
+
+  function renderPlayerInputs() {
+    var list = $("player-list");
+    list.textContent = "";
+    for (var i = 0; i < settings.count; i++) {
+      var li = el("li", "player-row");
+      var input = el("input");
+      input.type = "text";
+      input.maxLength = 16;
+      input.autocomplete = "off";
+      input.spellcheck = false;
+      input.enterKeyHint = i === settings.count - 1 ? "done" : "next";
+      input.placeholder = "Joueur " + (i + 1);
+      input.value = settings.names[i] || "";
+      input.dataset.index = String(i);
+      input.setAttribute("aria-label", "Prénom du joueur " + (i + 1));
+      li.appendChild(avatar(input.value, i));
+      li.appendChild(input);
+      list.appendChild(li);
+    }
+    $("players-count").textContent = String(settings.count);
+    $("players-minus").disabled = settings.count <= MIN_PLAYERS;
+    $("players-plus").disabled = settings.count >= MAX_PLAYERS;
+  }
+
+  $("player-list").addEventListener("input", function (e) {
+    var input = e.target;
+    if (!input.dataset || input.dataset.index == null) return;
+    var i = Number(input.dataset.index);
+    settings.names[i] = input.value;
+    var badge = input.parentNode.querySelector(".avatar");
+    badge.textContent = initial(input.value) || String(i + 1);
+    saveSettings();
+  });
+
+  $("player-list").addEventListener("keydown", function (e) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    var next = $("player-list").querySelector('input[data-index="' + (Number(e.target.dataset.index) + 1) + '"]');
+    if (next) next.focus(); else e.target.blur();
+  });
+
+  $("players-minus").addEventListener("click", function () {
+    settings.count = clamp(settings.count - 1, MIN_PLAYERS, MAX_PLAYERS);
+    saveSettings();
+    renderPlayerInputs();
+  });
+
+  $("players-plus").addEventListener("click", function () {
+    settings.count = clamp(settings.count + 1, MIN_PLAYERS, MAX_PLAYERS);
+    saveSettings();
+    renderPlayerInputs();
+  });
+
+  function renderThemes() {
+    var grid = $("theme-grid");
+    grid.textContent = "";
+    THEMES.forEach(function (t) {
+      var btn = el("button", "theme-card");
+      btn.type = "button";
+      btn.dataset.id = t.id;
+      btn.style.setProperty("--theme", t.color || DEFAULT_ACCENT);
+      btn.setAttribute("aria-pressed", String(settings.themes.indexOf(t.id) !== -1));
+      btn.appendChild(el("span", "theme-emoji", t.emoji || "🎲"));
+      btn.appendChild(el("span", "theme-name", t.name));
+      btn.appendChild(el("span", "theme-count", plural(t.pairs.length, "paire", "paires")));
+      grid.appendChild(btn);
+    });
+    updateThemeSummary();
+  }
+
+  function updateThemeSummary() {
+    var chosen = settings.themes.map(themeById).filter(Boolean);
+    var pairs = chosen.reduce(function (sum, t) { return sum + t.pairs.length; }, 0);
+    var all = chosen.length === THEMES.length;
+    $("themes-toggle").textContent = all ? "Tout désélectionner" : "Tout sélectionner";
+    $("themes-summary").textContent = chosen.length
+      ? (chosen.length === 1 ? "Thème\u00a0: " + chosen[0].name : plural(chosen.length, "thème", "thèmes") + " mélangés")
+        + " · " + plural(pairs, "paire", "paires") + " de mots"
+      : "Choisis au moins un thème.";
+    $("btn-start").disabled = !chosen.length;
+  }
+
+  $("theme-grid").addEventListener("click", function (e) {
+    var btn = e.target.closest(".theme-card");
+    if (!btn) return;
+    var id = btn.dataset.id;
+    var at = settings.themes.indexOf(id);
+    if (at === -1) settings.themes.push(id); else settings.themes.splice(at, 1);
+    btn.setAttribute("aria-pressed", String(at === -1));
+    saveSettings();
+    updateThemeSummary();
+  });
+
+  $("themes-toggle").addEventListener("click", function () {
+    settings.themes = settings.themes.length === THEMES.length ? [] : THEMES.map(function (t) { return t.id; });
+    saveSettings();
+    renderThemes();
+  });
+
+  $("scores-reset").addEventListener("click", function () {
+    confirmDialog("Remettre les scores à zéro\u00a0?", "Le classement de tous les joueurs sera effacé.", "Effacer", function () {
+      scores = {};
+      save(KEYS.scores, scores);
+      renderSetup();
+    });
+  });
+
+  // Prénoms définitifs : vides → « Joueur N », doublons → suffixe numéroté.
+  function collectNames() {
+    var names = [];
+    var seen = {};
+    for (var i = 0; i < settings.count; i++) {
+      var base = String(settings.names[i] || "").trim().replace(/\s+/g, " ") || "Joueur " + (i + 1);
+      var name = base;
+      var n = 2;
+      while (seen[name.toLowerCase()]) name = base + " " + n++;
+      seen[name.toLowerCase()] = true;
+      names.push(name);
+    }
+    return names;
+  }
+
+  // Tire une paire parmi les thèmes choisis, en évitant celles déjà jouées.
+  function pickPair(themeIds) {
+    var pool = [];
+    themeIds.map(themeById).filter(Boolean).forEach(function (t) {
+      t.pairs.forEach(function (pair) {
+        pool.push({ theme: t, pair: pair, key: t.id + ":" + pair.join("/") });
+      });
+    });
+    var used = load(KEYS.used, []);
+    if (!Array.isArray(used)) used = [];
+    var fresh = pool.filter(function (c) { return used.indexOf(c.key) === -1; });
+    if (!fresh.length) {
+      // Toutes les paires de ces thèmes ont été jouées : on repart de zéro pour elles.
+      var keys = pool.map(function (c) { return c.key; });
+      used = used.filter(function (k) { return keys.indexOf(k) === -1; });
+      fresh = pool;
+    }
+    var choice = fresh[randomInt(fresh.length)];
+    used.push(choice.key);
+    save(KEYS.used, used);
+    return choice;
+  }
+
+  function startGame() {
+    if (!settings.themes.length) { toast("Choisis au moins un thème."); return; }
+    var names = collectNames();
+    var pick = pickPair(settings.themes);
+    var swap = randomInt(2) === 1;
+    var undercover = randomInt(names.length);
+
+    game = {
+      phase: "pass",
+      themeId: pick.theme.id,
+      civilWord: pick.pair[swap ? 1 : 0],
+      underWord: pick.pair[swap ? 0 : 1],
+      players: names.map(function (name, i) {
+        return { name: name, seat: i, role: i === undercover ? "undercover" : "civil", alive: true, outRound: 0 };
+      }),
+      turn: 0,
+      round: 1,
+      starter: 0,
+      peek: null,
+      eliminated: null,
+      revealed: false,
+      winner: null,
+      scored: false
+    };
+    voteChoice = null;
+    saveGame();
+    keepAwake(true);
+    render();
+  }
+
+  $("btn-start").addEventListener("click", startGame);
+
+  /* ---------- Distribution des mots ---------- */
+
+  function currentHolder() {
+    return game.players[game.peek != null ? game.peek : game.turn];
+  }
+
+  function renderPass() {
+    var p = currentHolder();
+    $("pass-step").textContent = game.peek != null
+      ? "Revoir son mot"
+      : "Distribution · " + (game.turn + 1) + " / " + game.players.length;
+    fill($("pass-avatar"), avatar(p.name, p.seat, "avatar-xl"));
+    $("pass-name").textContent = p.name;
+    $("btn-show-word").textContent = "Je suis " + p.name + ", voir mon mot";
+  }
+
+  function renderReveal() {
+    var p = currentHolder();
+    var t = themeById(game.themeId);
+    $("reveal-for").textContent = p.name;
+    $("reveal-word").textContent = wordOf(p);
+    $("reveal-theme").textContent = t ? t.emoji + " " + t.name : "";
+    var last = game.peek == null && game.turn === game.players.length - 1;
+    $("btn-hide-word").textContent = game.peek != null
+      ? "C'est bon, cacher"
+      : last ? "C'est retenu, on commence\u00a0!" : "C'est retenu, cacher";
+  }
+
+  $("btn-show-word").addEventListener("click", function () {
+    game.phase = "reveal";
+    saveGame();
+    render();
+  });
+
+  $("btn-hide-word").addEventListener("click", function () {
+    if (game.peek != null) {
+      game.peek = null;
+      game.phase = "discuss";
+    } else if (game.turn < game.players.length - 1) {
+      game.turn++;
+      game.phase = "pass";
+    } else {
+      startRound();
+      return;
+    }
+    saveGame();
+    render();
+  });
+
+  /* ---------- Tours d'indices ---------- */
+
+  function startRound() {
+    var alive = alivePlayers();
+    game.starter = alive[randomInt(alive.length)].seat;
+    game.phase = "discuss";
+    voteChoice = null;
+    saveGame();
+    render();
+  }
+
+  // Joueurs en vie, dans l'ordre de la table, à partir de celui qui commence.
+  function speakingOrder() {
+    var n = game.players.length;
+    var order = [];
+    for (var k = 0; k < n; k++) {
+      var p = game.players[(game.starter + k) % n];
+      if (p.alive) order.push(p);
+    }
+    return order;
+  }
+
+  function renderDiscuss() {
+    $("discuss-step").textContent = "Tour " + game.round + " · " + plural(alivePlayers().length, "joueur", "joueurs") + " en jeu";
+    var list = $("speak-order");
+    list.textContent = "";
+    speakingOrder().forEach(function (p, i) {
+      var li = el("li", i === 0 ? "first" : "");
+      li.appendChild(avatar(p.name, p.seat));
+      li.appendChild(el("span", "", p.name));
+      if (i === 0) li.appendChild(el("span", "tag", "commence"));
+      list.appendChild(li);
+    });
+    renderOutList();
+  }
+
+  function renderOutList() {
+    var out = game.players.filter(function (p) { return !p.alive; });
+    $("out-block").hidden = !out.length;
+    var list = $("out-list");
+    list.textContent = "";
+    out.forEach(function (p) {
+      var li = el("li");
+      li.appendChild(avatar(p.name, p.seat));
+      li.appendChild(el("s", "", p.name));
+      li.appendChild(el("span", "", "· civil"));
+      list.appendChild(li);
+    });
+  }
+
+  $("btn-to-vote").addEventListener("click", function () {
+    game.phase = "vote";
+    voteChoice = null;
+    saveGame();
+    render();
+  });
+
+  $("btn-peek").addEventListener("click", function () {
+    var grid = el("div", "pick-list");
+    alivePlayers().forEach(function (p) {
+      var btn = el("button", "vote-card");
+      btn.type = "button";
+      btn.appendChild(avatar(p.name, p.seat));
+      btn.appendChild(el("span", "", p.name));
+      btn.addEventListener("click", function () {
+        closeModal();
+        game.peek = p.seat;
+        game.phase = "pass";
+        saveGame();
+        render();
+      });
+      grid.appendChild(btn);
+    });
+    openModal("Qui veut revoir son mot\u00a0?", grid, [{ label: "Annuler", className: "btn-ghost" }]);
+  });
+
+  /* ---------- Vote ---------- */
+
+  function renderVote() {
+    $("vote-step").textContent = "Tour " + game.round + " · Vote";
+    var grid = $("vote-grid");
+    grid.textContent = "";
+    alivePlayers().forEach(function (p) {
+      var btn = el("button", "vote-card");
+      btn.type = "button";
+      btn.dataset.seat = String(p.seat);
+      btn.setAttribute("aria-pressed", String(voteChoice === p.seat));
+      btn.appendChild(avatar(p.name, p.seat));
+      btn.appendChild(el("span", "", p.name));
+      grid.appendChild(btn);
+    });
+    updateVoteButton();
+  }
+
+  function updateVoteButton() {
+    var btn = $("btn-eliminate");
+    btn.disabled = voteChoice == null;
+    btn.textContent = voteChoice == null ? "Éliminer" : "Éliminer " + game.players[voteChoice].name;
+  }
+
+  $("vote-grid").addEventListener("click", function (e) {
+    var card = e.target.closest(".vote-card");
+    if (!card) return;
+    voteChoice = Number(card.dataset.seat);
+    Array.prototype.forEach.call($("vote-grid").children, function (c) {
+      c.setAttribute("aria-pressed", String(c === card));
+    });
+    updateVoteButton();
+  });
+
+  $("btn-back-discuss").addEventListener("click", function () {
+    game.phase = "discuss";
+    saveGame();
+    render();
+  });
+
+  $("btn-eliminate").addEventListener("click", function () {
+    if (voteChoice == null) return;
+    var p = game.players[voteChoice];
+    p.alive = false;
+    p.outRound = game.round;
+    game.eliminated = p.seat;
+    game.revealed = false;
+    game.phase = "elim";
+    voteChoice = null;
+    saveGame();
+    render();
+  });
+
+  /* ---------- Élimination ---------- */
+
+  function renderElim() {
+    var p = game.players[game.eliminated];
+    $("elim-step").textContent = "Tour " + game.round + " · Verdict";
+    fill($("elim-avatar"), avatar(p.name, p.seat, "avatar-xl"));
+    $("elim-name").textContent = p.name;
+
+    var role = $("elim-role");
+    var msg = $("elim-msg");
+    $("btn-elim-reveal").hidden = game.revealed;
+    $("btn-elim-next").hidden = !game.revealed;
+
+    if (!game.revealed) {
+      role.className = "role-card";
+      role.textContent = "?";
+      msg.textContent = "";
+      return;
+    }
+
+    var isUnder = p.role === "undercover";
+    role.className = "role-card " + (isUnder ? "is-under" : "is-civil");
+    role.textContent = isUnder ? "Undercover 🕵️" : "Civil 😇";
+    var small = el("small", "", "Son mot\u00a0: " + wordOf(p));
+    role.appendChild(small);
+
+    if (isUnder) {
+      msg.textContent = "Bien joué, vous avez démasqué l'Undercover\u00a0!";
+    } else if (game.winner === "undercover") {
+      msg.textContent = "Raté… Il ne reste que 2 joueurs\u00a0: l'Undercover l'emporte\u00a0!";
+    } else {
+      msg.textContent = "Raté\u00a0! L'Undercover court toujours… Encore " + plural(alivePlayers().length, "joueur", "joueurs") + " en lice.";
+    }
+    $("btn-elim-next").textContent = game.winner ? "Voir les résultats" : "Tour suivant";
+  }
+
+  $("btn-elim-reveal").addEventListener("click", function () {
+    var p = game.players[game.eliminated];
+    if (p.role === "undercover") game.winner = "civil";
+    else if (alivePlayers().length <= 2) game.winner = "undercover";
+    game.revealed = true;
+    buzz(p.role === "undercover" ? [90, 60, 90] : 60);
+    saveGame();
+    render();
+  });
+
+  $("btn-elim-next").addEventListener("click", function () {
+    if (game.winner) {
+      finishGame();
+    } else {
+      game.round++;
+      startRound();
+    }
+  });
+
+  /* ---------- Fin de partie et scores ---------- */
+
+  function pointsFor(p) {
+    if (game.winner === "civil") return p.role === "civil" ? POINTS_CIVIL : 0;
+    return p.role === "undercover" ? POINTS_UNDERCOVER : 0;
+  }
+
+  function finishGame() {
+    if (!game.scored) {
+      game.players.forEach(function (p) {
+        scores[p.name] = (scores[p.name] || 0) + pointsFor(p);
+      });
+      save(KEYS.scores, scores);
+      game.scored = true;
+    }
+    game.phase = "end";
+    saveGame();
+    render();
+  }
+
+  function renderEnd() {
+    var civilWin = game.winner === "civil";
+    var banner = $("end-banner");
+    banner.className = "end-banner " + (civilWin ? "win-civil" : "win-under");
+    banner.textContent = civilWin ? "🎉 Les civils gagnent\u00a0!" : "🕵️ L'Undercover gagne\u00a0!";
+    var under = game.players.filter(function (p) { return p.role === "undercover"; })[0];
+    banner.appendChild(el("small", "", civilWin
+      ? under.name + " a été démasqué·e au tour " + under.outRound + "."
+      : under.name + " a survécu jusqu'au bout."));
+
+    $("end-civil-word").textContent = game.civilWord;
+    $("end-under-word").textContent = game.underWord;
+
+    var list = $("end-players");
+    list.textContent = "";
+    game.players.forEach(function (p) {
+      var isUnder = p.role === "undercover";
+      var li = el("li", isUnder ? "is-under" : "");
+      li.appendChild(avatar(p.name, p.seat));
+      var who = el("div", "who");
+      who.appendChild(el("strong", "", p.name + (isUnder ? " 🕵️" : "")));
+      who.appendChild(el("span", "", (isUnder ? "Undercover" : "Civil")
+        + " · " + (p.alive ? "encore en jeu" : "éliminé·e au tour " + p.outRound)));
+      li.appendChild(who);
+      var pts = pointsFor(p);
+      li.appendChild(el("span", "pts" + (pts ? "" : " zero"), pts ? "+" + pts : "+0"));
+      list.appendChild(li);
+    });
+
+    renderScoreboard($("end-scores"), game.players.map(function (p) { return p.name; }));
+  }
+
+  function renderScoreboard(list, names) {
+    list.textContent = "";
+    var seats = {};
+    if (game) game.players.forEach(function (p) { seats[p.name] = p.seat; });
+    else collectNames().forEach(function (n, i) { seats[n] = i; });
+    names
+      .map(function (name) { return { name: name, score: scores[name] || 0 }; })
+      .sort(function (a, b) { return b.score - a.score || a.name.localeCompare(b.name, "fr"); })
+      .forEach(function (row, i) {
+        var li = el("li");
+        li.appendChild(avatar(row.name, seats[row.name] != null ? seats[row.name] : i));
+        li.appendChild(el("span", "name", row.name));
+        li.appendChild(el("span", "score", plural(row.score, "pt", "pts")));
+        list.appendChild(li);
+      });
+  }
+
+  $("btn-replay").addEventListener("click", startGame);
+
+  $("btn-menu").addEventListener("click", function () {
+    quitGame();
+  });
+
+  function quitGame() {
+    game = null;
+    voteChoice = null;
+    saveGame();
+    keepAwake(false);
+    render();
+  }
+
+  $("btn-quit").addEventListener("click", function () {
+    if (game.phase === "end") { quitGame(); return; }
+    confirmDialog("Quitter la partie\u00a0?", "La partie en cours sera abandonnée (les scores déjà gagnés sont conservés).", "Quitter", quitGame);
+  });
+
+  /* ---------- Boîtes de dialogue ---------- */
+
+  var modal = $("modal");
+
+  function openModal(title, content, buttons) {
+    $("modal-title").textContent = title;
+    var body = $("modal-content");
+    body.textContent = "";
+    if (typeof content === "string") body.appendChild(el("p", "", content));
+    else if (content) body.appendChild(content);
+    var actions = $("modal-actions");
+    actions.textContent = "";
+    buttons.forEach(function (b) {
+      var btn = el("button", "btn btn-big " + (b.className || "btn-primary"), b.label);
+      btn.type = "button";
+      btn.addEventListener("click", function () {
+        closeModal();
+        if (b.action) b.action();
+      });
+      actions.appendChild(btn);
+    });
+    if (modal.showModal) modal.showModal(); else modal.setAttribute("open", "");
+  }
+
+  function closeModal() {
+    if (modal.close) modal.close(); else modal.removeAttribute("open");
+  }
+
+  function confirmDialog(title, text, confirmLabel, onConfirm) {
+    openModal(title, text, [
+      { label: "Annuler", className: "btn-ghost" },
+      { label: confirmLabel, className: "btn-danger", action: onConfirm }
+    ]);
+  }
+
+  // Un appui sur le fond assombri ferme la feuille.
+  [modal, $("rules")].forEach(function (dialog) {
+    dialog.addEventListener("click", function (e) {
+      if (e.target === dialog) dialog.close();
+    });
+  });
+
+  $("btn-rules").addEventListener("click", function () {
+    var rules = $("rules");
+    if (rules.showModal) rules.showModal(); else rules.setAttribute("open", "");
+  });
+
+  /* ---------- Rendu ---------- */
+
+  var RENDERERS = {
+    setup: renderSetup,
+    pass: renderPass,
+    reveal: renderReveal,
+    discuss: renderDiscuss,
+    vote: renderVote,
+    elim: renderElim,
+    end: renderEnd
+  };
+
+  var shownPhase = null;
+
+  function render() {
+    var phase = game ? game.phase : "setup";
+    if (!RENDERERS[phase]) { game = null; phase = "setup"; saveGame(); }
+
+    var theme = game ? themeById(game.themeId) : null;
+    document.documentElement.style.setProperty("--accent", theme && theme.color ? theme.color : DEFAULT_ACCENT);
+    var badge = $("brand-theme");
+    badge.hidden = !theme;
+    $("brand-name").hidden = !!theme;
+    if (theme) badge.textContent = theme.emoji + " " + theme.name;
+    $("btn-quit").hidden = !game;
+
+    RENDERERS[phase]();
+
+    var screens = document.querySelectorAll(".screen");
+    for (var i = 0; i < screens.length; i++) screens[i].hidden = screens[i].id !== "screen-" + phase;
+    if (shownPhase !== phase) window.scrollTo(0, 0);
+    shownPhase = phase;
+  }
+
+  if (!THEMES.length) {
+    document.body.textContent = "Aucun thème trouvé\u00a0: vérifiez le fichier words.js.";
+    return;
+  }
+
+  render();
+  if (game) keepAwake(true);
+
+  /* ---------- Mode hors-ligne (installation sur l'écran d'accueil) ---------- */
+
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () { /* hors-ligne indisponible */ });
+    });
+  }
+})();
+  </script>
 </body>
 </html>

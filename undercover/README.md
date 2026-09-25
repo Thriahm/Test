@@ -4,8 +4,9 @@ Jeu d'ambiance à jouer **sur un seul téléphone** qu'on se passe de main en
 main. Règle fixe : **1 Undercover, 0 Mr White**. Pensé pour 4 joueurs
 (de 3 à 8 possibles).
 
-Aucune dépendance, aucun build : HTML, CSS et JS. Le jeu s'installe sur
-l'écran d'accueil et fonctionne ensuite hors-ligne.
+Tout le jeu tient dans **un seul fichier**, `index.html` (HTML, CSS, JS et
+mots inclus) : il suffit de l'ouvrir dans un navigateur, même sans serveur
+ni connexion. Hébergé en ligne, il s'installe aussi sur l'écran d'accueil.
 
 ## Comment jouer
 
@@ -46,11 +47,15 @@ thème.
 | ⚽ Sport | Messi / Ronaldo |
 | 🏠 Vie quotidienne | Instagram / TikTok |
 
-Plus de 400 paires au total. Pour en ajouter, éditez `words.js` : chaque
-thème est un objet `{ id, name, emoji, color, pairs: [["Mot A", "Mot B"], …] }`.
+Plus de 400 paires au total. Pour en ajouter, éditez la liste
+`window.UNDERCOVER_THEMES` dans `index.html` : chaque thème est un objet
+`{ id, name, emoji, color, pairs: [["Mot A", "Mot B"], …] }`.
 Le mot donné à l'Undercover est tiré au hasard dans la paire.
 
 ## Lancer le jeu
+
+Ouvrez `index.html` dans un navigateur (double-clic sur ordinateur, ou
+fichier transféré sur le téléphone). Pour tester avec un petit serveur :
 
 ```bash
 # depuis la racine du dépôt
@@ -58,7 +63,7 @@ python3 -m http.server 8000
 #   puis http://localhost:8000/undercover/
 ```
 
-Pour jouer sur un téléphone, publiez le dépôt sur un hébergeur statique
+Pour le garder sur un téléphone, publiez le dépôt sur un hébergeur statique
 (GitHub Pages, Netlify…) et ouvrez `…/undercover/`. Ensuite, menu du
 navigateur → « Ajouter à l'écran d'accueil » : le jeu s'ouvre alors en plein
 écran, comme une appli, même sans connexion.
@@ -69,10 +74,7 @@ navigateur → « Ajouter à l'écran d'accueil » : le jeu s'ouvre alors en ple
 ## Fichiers
 
 ```
-index.html            écrans du jeu
-style.css             styles (mobile d'abord)
-app.js                déroulement de la partie, votes, scores
-words.js              thèmes et paires de mots
+index.html            le jeu complet : écrans, styles, mots, logique
 manifest.webmanifest  installation sur l'écran d'accueil
 sw.js                 cache hors-ligne
 icons/                icônes de l'appli

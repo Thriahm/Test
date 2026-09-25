@@ -1,13 +1,10 @@
 /* Undercover — service worker : met le jeu en cache pour jouer hors-ligne.
    Incrémentez VERSION à chaque modification des fichiers pour forcer la mise à jour. */
 
-var VERSION = "undercover-v1";
+var VERSION = "undercover-v2";
 var FILES = [
   "./",
   "index.html",
-  "style.css",
-  "app.js",
-  "words.js",
   "manifest.webmanifest",
   "icons/icon.svg",
   "icons/icon-192.png",
